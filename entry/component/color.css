@@ -1,0 +1,27 @@
+.color {
+    color: black;
+}
+
+.normal {
+    color: black;
+}
+
+.add {
+    background-color: rgb(236, 253, 240);
+}
+
+.removed {
+    background-color: rgb(251,233,235);
+}
+
+.pre {
+    margin: 0;
+}
+
+.button {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+    color: brown;
+    border: 1px solid brown;
+}
