@@ -49,12 +49,9 @@ class ShowComponent extends React.Component {
     state = {
         lineGroup: []
     }
-    isobj = this.props.obj;
 
     componentDidMount() {
-        let c = jsDiff.diffJson(w1, w2);
-        this.isobj = { name: 2};
-        //let c = jsDiff.diffJson(a, b);
+        let c = jsDiff.diffJson(a, b);
         const initLineGroup = c.map((item, index, originArr) => {
             const { added, removed, value, count } = item;
             const strArr = value.split('\n').filter(item => item);
@@ -101,7 +98,6 @@ class ShowComponent extends React.Component {
     }
 
     openBlock = (type, index) => {
-        console.log(this.props.obj, this.isobj);
         const copyOfLG = this.state.lineGroup.slice();
         const targetGroup = copyOfLG[index];
         const { head, tail, hidden } = targetGroup.content;

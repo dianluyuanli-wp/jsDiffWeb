@@ -1,9 +1,9 @@
 {
-    "name": "iso-style",
+    "name": "webdiff",
     "version": "0.0.0",
     "scripts": {
         "start": "node ./bin/start",
-        "build": "webpack --color --config webpack.config.js",
+        "build": "webpack --color --config webpack.config.js"
     },
     "dependencies": {
         "@babel/core": "^7.3.4",
