@@ -45,6 +45,12 @@ module.exports = {
                                 '@babel/preset-env'
                             ],
                             plugins: [
+                                //  给antd做按需加载
+                                ["import", {
+                                    "libraryName": "antd",
+                                    //"libraryDirectory": "es",
+                                    "style": 'css' // `style: true` 会加载 less 文件
+                                }],
                                 //  这个拿来做注入代码优化的
                                 ['@babel/plugin-transform-runtime',
                                 {
@@ -61,14 +67,23 @@ module.exports = {
                 ]
             },
             {
-                test: /\.(css|scss)$/,
+                //  专门处理antd的css样式
+                test: /\.css$/,
+                include: /node_modules/,
                 use: [
-                    //  'isomorphic-style-loader',
-                    MiniCssExtractPlugin.loader,  //自动提取出css
-                    'css-loader?modules&localIdentName=[name]__[local]--[hash:base64:5]',
-
-                ]
+                    MiniCssExtractPlugin.loader,
+                    'css-loader'
+                ],
             },
+            {
+                //  正常的css使用css module
+                test: /\.css$/,
+                exclude: /node_modules/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader?modules&localIdentName=[name]__[local]--[hash:base64:5]'
+                ]
+            }
         ]
     },
     mode:"development",

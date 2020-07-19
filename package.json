@@ -8,6 +8,7 @@
     "dependencies": {
         "@babel/core": "^7.3.4",
         "@babel/preset-env": "^7.3.4",
+        "antd": "^4.4.2",
         "classnames": "^2.2.6",
         "diff": "^4.0.2",
         "ejs": "^2.4.1",
@@ -22,6 +23,7 @@
         "@babel/plugin-transform-runtime": "^7.3.4",
         "@babel/preset-react": "^7.0.0",
         "babel-loader": "^8.0.6",
+        "babel-plugin-import": "^1.13.0",
         "css-loader": "^0.28.11",
         "mini-css-extract-plugin": "^0.4.5",
         "webpack": "^4.29.6",
