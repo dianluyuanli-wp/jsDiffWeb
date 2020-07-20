@@ -113,10 +113,13 @@ class ShowComponent extends React.Component {
         if (type === 'head') {
             targetGroup.content.head = head.concat(hidden.slice(0, BLOCK_LENGTH));
             targetGroup.content.hidden = hidden.slice(BLOCK_LENGTH);
-        } else {
+        } else if (type === 'tail') {
             const hLenght = hidden.length;
             targetGroup.content.tail = hidden.slice(hLenght - BLOCK_LENGTH).concat(tail);
             targetGroup.content.hidden = hidden.slice(0, hLenght - BLOCK_LENGTH);
+        } else {
+            targetGroup.content.head = head.concat(hidden);
+            targetGroup.content.hidden = [];
         }
         copyOfLG[index] = targetGroup;
         this.setState({
@@ -124,11 +127,24 @@ class ShowComponent extends React.Component {
         });
     }
 
-    getHiddenBtn = (hidden, isNormal, index) => {
-        const isSingle = hidden.length < BLOCK_LENGTH;
-        return <div key='collapse'>
-            <div className={s.colLeft}></div>
-            <div className={s.collRight}></div>
+    getHiddenBtn = (hidden, index) => {
+        const isSingle = hidden.length < BLOCK_LENGTH * 2;
+        return <div key='collapse' className={s.cutWrapper}>
+            <div className={s.colLeft}>
+                {isSingle ? <div className={s.arrow} onClick={this.openBlock.bind(this, 'all', index)}>
+                    <svg className={s.octicon} viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fillRule="evenodd" d="M8.177.677l2.896 2.896a.25.25 0 01-.177.427H8.75v1.25a.75.75 0 01-1.5 0V4H5.104a.25.25 0 01-.177-.427L7.823.677a.25.25 0 01.354 0zM7.25 10.75a.75.75 0 011.5 0V12h2.146a.25.25 0 01.177.427l-2.896 2.896a.25.25 0 01-.354 0l-2.896-2.896A.25.25 0 015.104 12H7.25v-1.25zm-5-2a.75.75 0 000-1.5h-.5a.75.75 0 000 1.5h.5zM6 8a.75.75 0 01-.75.75h-.5a.75.75 0 010-1.5h.5A.75.75 0 016 8zm2.25.75a.75.75 0 000-1.5h-.5a.75.75 0 000 1.5h.5zM12 8a.75.75 0 01-.75.75h-.5a.75.75 0 010-1.5h.5A.75.75 0 0112 8zm2.25.75a.75.75 0 000-1.5h-.5a.75.75 0 000 1.5h.5z"></path></svg>
+                </div>
+                    : <React.Fragment>
+                        <div className={s.arrow} onClick={this.openBlock.bind(this, 'head', index)}>
+                            <svg className={s.octicon} viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fillRule="evenodd" d="M8.177 14.323l2.896-2.896a.25.25 0 00-.177-.427H8.75V7.764a.75.75 0 10-1.5 0V11H5.104a.25.25 0 00-.177.427l2.896 2.896a.25.25 0 00.354 0zM2.25 5a.75.75 0 000-1.5h-.5a.75.75 0 000 1.5h.5zM6 4.25a.75.75 0 01-.75.75h-.5a.75.75 0 010-1.5h.5a.75.75 0 01.75.75zM8.25 5a.75.75 0 000-1.5h-.5a.75.75 0 000 1.5h.5zM12 4.25a.75.75 0 01-.75.75h-.5a.75.75 0 010-1.5h.5a.75.75 0 01.75.75zm2.25.75a.75.75 0 000-1.5h-.5a.75.75 0 000 1.5h.5z"></path></svg>
+                        </div>
+                        <div className={s.arrow} onClick={this.openBlock.bind(this, 'tail', index)}>
+                            <svg className={s.octicon} viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fillRule="evenodd" d="M7.823 1.677L4.927 4.573A.25.25 0 005.104 5H7.25v3.236a.75.75 0 101.5 0V5h2.146a.25.25 0 00.177-.427L8.177 1.677a.25.25 0 00-.354 0zM13.75 11a.75.75 0 000 1.5h.5a.75.75 0 000-1.5h-.5zm-3.75.75a.75.75 0 01.75-.75h.5a.75.75 0 010 1.5h-.5a.75.75 0 01-.75-.75zM7.75 11a.75.75 0 000 1.5h.5a.75.75 0 000-1.5h-.5zM4 11.75a.75.75 0 01.75-.75h.5a.75.75 0 010 1.5h-.5a.75.75 0 01-.75-.75zM1.75 11a.75.75 0 000 1.5h.5a.75.75 0 000-1.5h-.5z"></path></svg>
+                        </div>
+                    </React.Fragment>
+                }
+            </div>
+        <div className={s.collRight}><div className={cx(s.colRContent, isSingle ? '' : s.cRHeight)}>{`当前隐藏内容:${hidden.length}行`}</div></div>
         </div>
     }
 
@@ -169,8 +185,7 @@ class ShowComponent extends React.Component {
             })
             return <div key={index}>
                 {headLine}
-                {hidden.length && isNormal && <div className={s.button} key={'up'} onClick={this.openBlock.bind(this, 'head', index)}>up 点我查看更多</div> || null}
-                {hidden.length && isNormal && <div className={s.button} key={'down'} onClick={this.openBlock.bind(this, 'tail', index)}>down 点我查看更多</div> || null}
+                {hidden.length && isNormal && this.getHiddenBtn(hidden, index) || null}
                 {tailLine}
             </div>
         })
@@ -206,11 +221,6 @@ class ShowComponent extends React.Component {
                 </div>
             </Content>
         </Layout>
-        // return <div className={s.color}>
-        //     <div>
-        //         {this.getRenderContent()}
-        //     </div>
-        // </div>
     }
 }
 

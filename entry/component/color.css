@@ -36,5 +36,46 @@
 }
 
 .line {
-    color: rgba(27,31,35,.3);;
+    color: rgba(27,31,35,.3);
+    width: 88px;
+}
+
+.colLeft {
+    display: inline-block;
+    color: #586069;
+    width: 88px;
+    background-color: #dbedff;
+}
+
+.collRight {
+    display: inline-block;
+    width: calc(100% - 88px);
+    vertical-align: top;
+}
+
+.colRContent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 16px;
+    background-color: #f1f8ff;
+}
+
+.octicon {
+    fill: currentColor;
+}
+
+.arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.arrow:hover {
+    color: #fff;
+    background-color: rgb(3, 102, 214);
+}
+
+.cRHeight {
+    height: 32px;
 }
