@@ -19,6 +19,7 @@
 
 .pre {
     margin: 0;
+    vertical-align: top;
     display: inline-block;
 }
 
@@ -33,6 +34,18 @@
 .content {
     padding: 2%;
     background-color: rgba(255, 255, 255, 0.2);
+}
+
+.outerPre {
+    width: calc(100% - 88px);
+    display: inline-block;
+}
+
+.innerPre {
+    margin: 0;
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
 }
 
 .line {
@@ -78,4 +91,10 @@
 
 .cRHeight {
     height: 32px;
+}
+
+.sPart {
+    display: inline-block;
+    vertical-align: top;
+    width: 50%;
 }

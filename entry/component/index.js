@@ -148,47 +148,71 @@ class ShowComponent extends React.Component {
         </div>
     }
 
-    getRenderContent = () => {
-        return this.state.lineGroup.map((item, index) => {
-            const { type, content: { head, tail, hidden }, leftPos, rightPos} = item;
-            const cls = cx(s.normal, type === '+' ? s.add : '', type === '-' ? s.removed : '');
-            const isNormal = type === ' ';
-            const space = "     ";
-            const headLine = head.map((sitem, sindex) => {
-                let posMark = '';
-                if (isNormal) {
-                    posMark = (space + (leftPos + sindex)).slice(-5)
-                        + (space + (rightPos + sindex)).slice(-5);
-                } else {
-                    posMark = type === '-' ? (space + (leftPos + sindex)).slice(-5) + space
-                        : space + (space + (rightPos + sindex)).slice(-5);
-                }
-                return <div key={'h-' + sindex} className={cls}>
-                    <pre className={cx(s.pre, s.line)}>{posMark}</pre>
-                    <pre className={s.pre}>{' ' + type}{sitem}</pre>
-                </div>
-            })
-            const tailLine = tail.map((sitem, sindex) => {
-                let posMark = '';
-                const posShift = head.length + hidden.length;
-                if (isNormal) {
-                    posMark = (space + (leftPos + sindex + posShift)).slice(-5)
-                        + (space + (rightPos + sindex + posShift)).slice(-5);
-                } else {
-                    posMark = type === '-' ? (space + (leftPos + sindex + posShift)).slice(-5) + '|' + space
-                        : space + (space + (rightPos + sindex + posShift)).slice(-5);
-                }
-                return <div key={'t-' + sindex} className={cls}>                    
-                    <pre className={cx(s.pre, s.line)}>{posMark}</pre>
-                    <pre className={s.pre}>{' ' + type}{sitem}</pre>
-                </div>
-            })
-            return <div key={index}>
-                {headLine}
-                {hidden.length && isNormal && this.getHiddenBtn(hidden, index) || null}
-                {tailLine}
+    paintCode = (item, isHead = true) => {
+        const { type, content: { head, tail }, leftPos, rightPos} = item;
+        const isNormal = type === ' ';
+        const cls = cx(s.normal, type === '+' ? s.add : '', type === '-' ? s.removed : '');
+        const space = "     ";
+        return (isHead ? head : tail).map((sitem, sindex) => {
+            let posMark = '';
+            const padding = { paddingLeft: (sitem.length - sitem.trimStart().length) * 8 + 'px'};
+            if (isNormal) {
+                posMark = (space + (leftPos + sindex)).slice(-5)
+                    + (space + (rightPos + sindex)).slice(-5);
+            } else {
+                posMark = type === '-' ? (space + (leftPos + sindex)).slice(-5) + space
+                    : space + (space + (rightPos + sindex)).slice(-5);
+            }
+            return <div key={(isHead ? 'h-' : 't-') + sindex} className={cls}>
+                <pre className={cx(s.pre, s.line)}>{posMark}</pre>
+                <div className={s.outerPre}><pre className={s.innerPre}>{' ' + type}<span style={padding}>{sitem}</span></pre></div>
             </div>
         })
+    }
+
+    getUnifiedRenderContent = () => {
+        return this.state.lineGroup.map((item, index) => {
+            const { type, content: { hidden }} = item;
+            const isNormal = type === ' ';
+            return <div key={index}>
+                {this.paintCode(item)}
+                {hidden.length && isNormal && this.getHiddenBtn(hidden, index) || null}
+                {this.paintCode(item, false)}
+            </div>
+        })
+    }
+
+    getSplitCode = (item) => {
+        const { type, content: { head, hidden, tail }, leftPos, rightPos} = item;
+        return <React.Fragment>
+            {head.map((sitem, index) => {
+            return <div>
+                <div>{leftPos + index}</div>
+                <div>{sitem}</div>
+            </div>;
+            })}
+        </React.Fragment>
+    }
+
+    getSplitContent = (type) => {
+        return <div>
+            {this.state.lineGroup.map((item, index) => {
+                const { type, content: { head, hidden, tail }, leftPos, rightPos} = item;
+                return <div key={index}>
+                    {head.map((sitem, sinex) => {
+                        <div key={sindex}></div>
+                    })}
+                    <div><div></div></div>
+                </div>
+            })}
+        </div>
+    }
+
+    getSplitedContent = () => {
+        return <div>
+            <div className={s.sPart}></div>
+            <div className={s.sPart}></div>
+        </div>
     }
 
     changeFile = async (info) => {
@@ -215,9 +239,10 @@ class ShowComponent extends React.Component {
             </Menu>
             <Content className={s.content}>
                 <div className={s.color}>
-                    <div>
-                        {this.getRenderContent()}
-                    </div>
+                    {/* <div>
+                        {this.getUnifiedRenderContent()}
+                    </div> */}
+                    {this.getSplitedContent()}
                 </div>
             </Content>
         </Layout>
