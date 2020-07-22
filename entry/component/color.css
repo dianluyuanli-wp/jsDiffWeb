@@ -98,3 +98,12 @@
     vertical-align: top;
     width: 50%;
 }
+
+.iBlock {
+    display: inline-block;
+    width: 50%;
+}
+
+.prBlock {
+    width: 100%;
+}

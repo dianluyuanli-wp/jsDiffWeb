@@ -60,7 +60,8 @@ module.exports = {
                                     "useESModules": false
                                 }],
                                 //  支持类写法
-                                "@babel/plugin-proposal-class-properties"
+                                "@babel/plugin-proposal-class-properties",
+                                '@babel/plugin-proposal-optional-chaining'
                             ]
                         }
                     }

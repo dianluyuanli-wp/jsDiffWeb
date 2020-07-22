@@ -155,7 +155,7 @@ class ShowComponent extends React.Component {
         const space = "     ";
         return (isHead ? head : tail).map((sitem, sindex) => {
             let posMark = '';
-            const padding = { paddingLeft: (sitem.length - sitem.trimStart().length) * 8 + 'px'};
+            const padding = this.getPadding(sitem);
             if (isNormal) {
                 posMark = (space + (leftPos + sindex)).slice(-5)
                     + (space + (rightPos + sindex)).slice(-5);
@@ -182,36 +182,64 @@ class ShowComponent extends React.Component {
         })
     }
 
-    getSplitCode = (item) => {
-        const { type, content: { head, hidden, tail }, leftPos, rightPos} = item;
+    getPadding = (item) => {
+        return { paddingLeft: (item.length - item.trimStart().length) * 8 + 'px' }
+    }
+
+    getSplitCode = (arr, isHead = true) => {
+        return arr.map((item, index) => {
+            const padding = this.getPadding(item);
+            return <div key={(isHead ? 'h-' : 't-') + index}>
+                <div className={s.iBlock}><span style={padding}>{item}</span></div>
+                <div className={s.iBlock}><span style={padding}>{item}</span></div>
+            </div>
+        })
+    }
+
+    getCombinePart = (leftPart = {}, rightPart = {}) => {
+        const { type: lType, content: lContent, leftPos: lLeftPos, rightPos: lRightPos } = leftPart;
+        const { type: rType, content: rContent, leftPos: rLeftPos, rightPos: rRightPos } = rightPart;
+        const lArr = lContent?.head || [];
+        const rArr = rContent?.head || [];
+        const lClass = lType === '+' ? s.add : s.removed;
+        const rClass = rType === '+' ? s.add : s.removed;
         return <React.Fragment>
-            {head.map((sitem, index) => {
-            return <div>
-                <div>{leftPos + index}</div>
-                <div>{sitem}</div>
-            </div>;
-            })}
-        </React.Fragment>
+                <div className={s.iBlock}>{lArr.map((item, index) => {
+                    return <div className={cx(s.prBlock, lClass)} key={index}><span style={this.getPadding(item)}>{item}</span></div>
+                })}</div>
+                <div className={s.iBlock}>{rArr.map((item, index) => {
+                    return <div className={cx(s.prBlock, rClass)} key={index}><span style={this.getPadding(item)}>{item}</span></div>
+                })}</div>
+            </React.Fragment>
     }
 
     getSplitContent = (type) => {
+        const length = this.state.lineGroup.length;
+        const contentList = [];
+        for (let i = 0; i < length; i++) {
+            const targetBlock = this.state.lineGroup[i];
+            const { type, content: { head, hidden, tail }, leftPos, rightPos} = targetBlock;
+            
+            if (type === ' ') {
+                contentList.push(<div key={i}>
+                    {this.getSplitCode(head)}
+                    {this.getSplitCode(tail, false)}
+                </div>)
+            } else if (type === '-') {
+                const nextTarget = this.state.lineGroup[i + 1] || { content: {}};
+                const nextIsPlus = nextTarget.type === '+';
+                contentList.push(<div key={i}>
+                    {this.getCombinePart(targetBlock, nextIsPlus ? nextTarget : {})}
+                </div>)
+                nextIsPlus ? i = i + 1 : void 0;
+            } else if (type === '+') {
+                contentList.push(<div key={i}>
+                    {this.getCombinePart({}, targetBlock)}
+                </div>)
+            }
+        }
         return <div>
-            {this.state.lineGroup.map((item, index) => {
-                const { type, content: { head, hidden, tail }, leftPos, rightPos} = item;
-                return <div key={index}>
-                    {head.map((sitem, sinex) => {
-                        <div key={sindex}></div>
-                    })}
-                    <div><div></div></div>
-                </div>
-            })}
-        </div>
-    }
-
-    getSplitedContent = () => {
-        return <div>
-            <div className={s.sPart}></div>
-            <div className={s.sPart}></div>
+            {contentList}
         </div>
     }
 
@@ -242,7 +270,7 @@ class ShowComponent extends React.Component {
                     {/* <div>
                         {this.getUnifiedRenderContent()}
                     </div> */}
-                    {this.getSplitedContent()}
+                    {this.getSplitContent()}
                 </div>
             </Content>
         </Layout>
