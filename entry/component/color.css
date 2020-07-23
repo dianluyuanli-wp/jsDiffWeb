@@ -107,3 +107,41 @@
 .prBlock {
     width: 100%;
 }
+
+.padding0 {
+    padding-left: 0px;
+}
+
+.padding1 {
+    padding-left: 8px;
+}
+
+.padding2 {
+    padding-left: 16px;
+}
+
+.padding3 {
+    padding-left: 24px;
+}
+
+.padding4 {
+    padding-left: 32px;
+}
+
+.padding5 {
+    padding-left: 40px;
+}
+
+.splitLN {
+    width: 44px;
+    margin-right: 8px;
+    display: inline-block;
+}
+
+.splitCon {
+    display: inline-block;
+}
+
+.filled {
+    width: calc(100% - 52px);
+}

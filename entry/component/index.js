@@ -47,6 +47,14 @@ let b = {
 // export default ShowComponent;
 const BLOCK_LENGTH = 5;
 
+const paddingClassMap = {
+    0: s.padding0,
+    1: s.padding1,
+    2: s.padding2,
+    3: s.padding3,
+    4: s.padding4
+}
+
 //  传统写法
 class ShowComponent extends React.Component {
     state = {
@@ -148,24 +156,28 @@ class ShowComponent extends React.Component {
         </div>
     }
 
+    getLineNum = (number) => {
+        return ('     ' + number).slice(-5);
+    }
+
     paintCode = (item, isHead = true) => {
-        const { type, content: { head, tail }, leftPos, rightPos} = item;
+        const { type, content: { head, tail, hidden }, leftPos, rightPos} = item;
         const isNormal = type === ' ';
         const cls = cx(s.normal, type === '+' ? s.add : '', type === '-' ? s.removed : '');
         const space = "     ";
         return (isHead ? head : tail).map((sitem, sindex) => {
             let posMark = '';
-            const padding = this.getPadding(sitem);
             if (isNormal) {
-                posMark = (space + (leftPos + sindex)).slice(-5)
-                    + (space + (rightPos + sindex)).slice(-5);
+                const shift = isHead ? 0: (head.length + hidden.length);
+                posMark = (space + (leftPos + shift + sindex)).slice(-5)
+                    + (space + (rightPos + shift + sindex)).slice(-5);
             } else {
-                posMark = type === '-' ? (space + (leftPos + sindex)).slice(-5) + space
-                    : space + (space + (rightPos + sindex)).slice(-5);
+                posMark = type === '-' ? this.getLineNum(leftPos + sindex) + space
+                    : space + this.getLineNum(rightPos + sindex);
             }
             return <div key={(isHead ? 'h-' : 't-') + sindex} className={cls}>
                 <pre className={cx(s.pre, s.line)}>{posMark}</pre>
-                <div className={s.outerPre}><pre className={s.innerPre}>{' ' + type}<span style={padding}>{sitem}</span></pre></div>
+                <div className={s.outerPre}><pre className={s.innerPre}>{' ' + type}{this.getPaddingContent(sitem, true)}</pre></div>
             </div>
         })
     }
@@ -182,18 +194,32 @@ class ShowComponent extends React.Component {
         })
     }
 
-    getPadding = (item) => {
-        return { paddingLeft: (item.length - item.trimStart().length) * 8 + 'px' }
+    //  获取split下的页码node
+    getLNPadding = (origin) => {
+        const item = ('     ' + origin).slice(-5);
+        const classType = item.length - item.trimStart().length;
+        return <div className={cx(paddingClassMap[classType], s.splitLN)}>{item}</div>
+    }
+    //  获取split下的内容node
+    getPaddingContent = (item, filled = false) => {
+        const styObj = { paddingLeft: (item.length - item.trimStart().length) * 8 + 'px' };
+        return <div className={cx(s.splitCon, filled ? s.filled : '')} style={styObj}>{item}</div>
     }
 
-    getSplitCode = (arr, isHead = true) => {
-        return arr.map((item, index) => {
-            const padding = this.getPadding(item);
+    getSplitCode = (targetBlock, isHead = true) => {
+        const { type, content: { head, hidden, tail }, leftPos, rightPos} = targetBlock;
+        return (isHead ? head : tail).map((item, index) => {
+            const shift = isHead ? 0: (head.length + hidden.length);
             return <div key={(isHead ? 'h-' : 't-') + index}>
-                <div className={s.iBlock}><span style={padding}>{item}</span></div>
-                <div className={s.iBlock}><span style={padding}>{item}</span></div>
+                <div className={s.iBlock}>{this.getLNPadding(leftPos + shift + index)}{this.getPaddingContent(' ')}{this.getPaddingContent(item, true)}</div>
+                <div className={s.iBlock}>{this.getLNPadding(rightPos + shift +index)}{this.getPaddingContent(' ')}{this.getPaddingContent(item, true)}</div>
             </div>
         })
+    }
+
+    //  获取split下的隐藏代码
+    getHiddenCode = (targetBlock) => {
+        const { type, content: { head, hidden, tail }, leftPos, rightPos} = targetBlock;
     }
 
     getCombinePart = (leftPart = {}, rightPart = {}) => {
@@ -205,25 +231,33 @@ class ShowComponent extends React.Component {
         const rClass = rType === '+' ? s.add : s.removed;
         return <React.Fragment>
                 <div className={s.iBlock}>{lArr.map((item, index) => {
-                    return <div className={cx(s.prBlock, lClass)} key={index}><span style={this.getPadding(item)}>{item}</span></div>
+                    return <div className={cx(s.prBlock, lClass)} key={index}>
+                        {this.getLNPadding(lLeftPos + index)}
+                        {this.getPaddingContent('-')}
+                        {this.getPaddingContent(item, true)}
+                    </div>
                 })}</div>
                 <div className={s.iBlock}>{rArr.map((item, index) => {
-                    return <div className={cx(s.prBlock, rClass)} key={index}><span style={this.getPadding(item)}>{item}</span></div>
+                    return <div className={cx(s.prBlock, rClass)} key={index}>
+                        {this.getLNPadding(rRightPos + index)}
+                        {this.getPaddingContent('+')}
+                        {this.getPaddingContent(item, true)}
+                    </div>
                 })}</div>
             </React.Fragment>
     }
 
-    getSplitContent = (type) => {
+    getSplitContent = () => {
         const length = this.state.lineGroup.length;
         const contentList = [];
         for (let i = 0; i < length; i++) {
             const targetBlock = this.state.lineGroup[i];
-            const { type, content: { head, hidden, tail }, leftPos, rightPos} = targetBlock;
-            
+            const { type, content: { hidden } } = targetBlock;
             if (type === ' ') {
                 contentList.push(<div key={i}>
-                    {this.getSplitCode(head)}
-                    {this.getSplitCode(tail, false)}
+                    {this.getSplitCode(targetBlock)}
+                    {this.getHiddenBtn(hidden, i)}
+                    {this.getSplitCode(targetBlock, false)}
                 </div>)
             } else if (type === '-') {
                 const nextTarget = this.state.lineGroup[i + 1] || { content: {}};
