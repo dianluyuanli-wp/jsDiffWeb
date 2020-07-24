@@ -32,7 +32,8 @@
 }
 
 .content {
-    padding: 2%;
+    padding-left: 2%;
+    padding-right: 2%;
     background-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -60,16 +61,24 @@
     background-color: #dbedff;
 }
 
+.splitWidth {
+    width: 44px;
+}
+
 .collRight {
     display: inline-block;
     width: calc(100% - 88px);
     vertical-align: top;
 }
 
+.collRightSplit {
+    width: calc(100% - 44px);
+}
+
 .colRContent {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     height: 16px;
     background-color: #f1f8ff;
 }
@@ -108,40 +117,39 @@
     width: 100%;
 }
 
-.padding0 {
-    padding-left: 0px;
-}
-
-.padding1 {
-    padding-left: 8px;
-}
-
-.padding2 {
-    padding-left: 16px;
-}
-
-.padding3 {
-    padding-left: 24px;
-}
-
-.padding4 {
-    padding-left: 32px;
-}
-
-.padding5 {
-    padding-left: 40px;
-}
-
 .splitLN {
     width: 44px;
-    margin-right: 8px;
     display: inline-block;
+    white-space: pre-wrap;
 }
 
 .splitCon {
     display: inline-block;
+    white-space: pre-wrap;
+    vertical-align: top;
+    width: calc(100% - 44px);
 }
 
 .filled {
     width: calc(100% - 52px);
+}
+
+.radioGroup {
+    display: flex;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    justify-content: flex-end;
+    align-items: center;
+    padding-left: 2%;
+    padding-right: 2%;
+}
+
+.lBorder {
+    border-right: 1px solid #ddd;
+}
+
+.rBorder {
+    border-left: 1px solid #ddd;
+    position: relative;
+    left: -1px;
 }

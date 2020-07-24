@@ -2,11 +2,16 @@ import React from 'react';
 import s from './color.css';
 var jsDiff = require('diff');
 import cx from 'classnames';
-import { Upload, Button, Layout, Menu } from 'antd';
+import { Upload, Button, Layout, Menu, Radio } from 'antd';
 
 const { Header, Content, Footer } = Layout;
 import w1 from '../../w1';
 import w2 from '../../w2';
+
+const SHOW_TYPE = {
+    UNIFIED: 0,
+    SPLITED: 1
+}
 
 let a = {
     name: 'wang',
@@ -38,27 +43,13 @@ let b = {
         4
     ]
 }
-
-//  react hooks 写法
-// const ShowComponent = () => {
-//     useStyles(s);
-//     return <div className={s.color}>英雄的中国人民万岁万岁！</div>
-// }
-// export default ShowComponent;
 const BLOCK_LENGTH = 5;
-
-const paddingClassMap = {
-    0: s.padding0,
-    1: s.padding1,
-    2: s.padding2,
-    3: s.padding3,
-    4: s.padding4
-}
 
 //  传统写法
 class ShowComponent extends React.Component {
     state = {
-        lineGroup: []
+        lineGroup: [],
+        showType: SHOW_TYPE.UNIFIED
     }
 
     componentDidMount() {
@@ -135,10 +126,14 @@ class ShowComponent extends React.Component {
         });
     }
 
+    get isSplit() {
+        return this.state.showType === SHOW_TYPE.SPLITED;
+    }
+
     getHiddenBtn = (hidden, index) => {
         const isSingle = hidden.length < BLOCK_LENGTH * 2;
         return <div key='collapse' className={s.cutWrapper}>
-            <div className={s.colLeft}>
+            <div className={cx(s.colLeft, this.isSplit ? s.splitWidth : '')}>
                 {isSingle ? <div className={s.arrow} onClick={this.openBlock.bind(this, 'all', index)}>
                     <svg className={s.octicon} viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fillRule="evenodd" d="M8.177.677l2.896 2.896a.25.25 0 01-.177.427H8.75v1.25a.75.75 0 01-1.5 0V4H5.104a.25.25 0 01-.177-.427L7.823.677a.25.25 0 01.354 0zM7.25 10.75a.75.75 0 011.5 0V12h2.146a.25.25 0 01.177.427l-2.896 2.896a.25.25 0 01-.354 0l-2.896-2.896A.25.25 0 015.104 12H7.25v-1.25zm-5-2a.75.75 0 000-1.5h-.5a.75.75 0 000 1.5h.5zM6 8a.75.75 0 01-.75.75h-.5a.75.75 0 010-1.5h.5A.75.75 0 016 8zm2.25.75a.75.75 0 000-1.5h-.5a.75.75 0 000 1.5h.5zM12 8a.75.75 0 01-.75.75h-.5a.75.75 0 010-1.5h.5A.75.75 0 0112 8zm2.25.75a.75.75 0 000-1.5h-.5a.75.75 0 000 1.5h.5z"></path></svg>
                 </div>
@@ -152,7 +147,7 @@ class ShowComponent extends React.Component {
                     </React.Fragment>
                 }
             </div>
-        <div className={s.collRight}><div className={cx(s.colRContent, isSingle ? '' : s.cRHeight)}>{`当前隐藏内容:${hidden.length}行`}</div></div>
+            <div className={cx(s.collRight, this.isSplit ? s.collRightSplit : '')}><div className={cx(s.colRContent, isSingle ? '' : s.cRHeight)}>{`当前隐藏内容:${hidden.length}行`}</div></div>
         </div>
     }
 
@@ -197,13 +192,11 @@ class ShowComponent extends React.Component {
     //  获取split下的页码node
     getLNPadding = (origin) => {
         const item = ('     ' + origin).slice(-5);
-        const classType = item.length - item.trimStart().length;
-        return <div className={cx(paddingClassMap[classType], s.splitLN)}>{item}</div>
+        return <div className={cx(s.splitLN)}>{item}</div>
     }
     //  获取split下的内容node
-    getPaddingContent = (item, filled = false) => {
-        const styObj = { paddingLeft: (item.length - item.trimStart().length) * 8 + 'px' };
-        return <div className={cx(s.splitCon, filled ? s.filled : '')} style={styObj}>{item}</div>
+    getPaddingContent = (item) => {
+        return <div className={cx(s.splitCon)}>{item}</div>
     }
 
     getSplitCode = (targetBlock, isHead = true) => {
@@ -211,15 +204,10 @@ class ShowComponent extends React.Component {
         return (isHead ? head : tail).map((item, index) => {
             const shift = isHead ? 0: (head.length + hidden.length);
             return <div key={(isHead ? 'h-' : 't-') + index}>
-                <div className={s.iBlock}>{this.getLNPadding(leftPos + shift + index)}{this.getPaddingContent(' ')}{this.getPaddingContent(item, true)}</div>
-                <div className={s.iBlock}>{this.getLNPadding(rightPos + shift +index)}{this.getPaddingContent(' ')}{this.getPaddingContent(item, true)}</div>
+                <div className={cx(s.iBlock, s.lBorder)}>{this.getLNPadding(leftPos + shift + index)}{this.getPaddingContent('  ' + item)}</div>
+                <div className={s.iBlock}>{this.getLNPadding(rightPos + shift +index)}{this.getPaddingContent('  ' + item)}</div>
             </div>
         })
-    }
-
-    //  获取split下的隐藏代码
-    getHiddenCode = (targetBlock) => {
-        const { type, content: { head, hidden, tail }, leftPos, rightPos} = targetBlock;
     }
 
     getCombinePart = (leftPart = {}, rightPart = {}) => {
@@ -230,18 +218,16 @@ class ShowComponent extends React.Component {
         const lClass = lType === '+' ? s.add : s.removed;
         const rClass = rType === '+' ? s.add : s.removed;
         return <React.Fragment>
-                <div className={s.iBlock}>{lArr.map((item, index) => {
+                <div className={cx(s.iBlock, s.lBorder)}>{lArr.map((item, index) => {
                     return <div className={cx(s.prBlock, lClass)} key={index}>
                         {this.getLNPadding(lLeftPos + index)}
-                        {this.getPaddingContent('-')}
-                        {this.getPaddingContent(item, true)}
+                        {this.getPaddingContent('-' + item)}
                     </div>
                 })}</div>
-                <div className={s.iBlock}>{rArr.map((item, index) => {
+                <div className={cx(s.iBlock, lArr.length ? '' : s.rBorder)}>{rArr.map((item, index) => {
                     return <div className={cx(s.prBlock, rClass)} key={index}>
                         {this.getLNPadding(rRightPos + index)}
-                        {this.getPaddingContent('+')}
-                        {this.getPaddingContent(item, true)}
+                        {this.getPaddingContent('+' + item)}
                     </div>
                 })}</div>
             </React.Fragment>
@@ -277,6 +263,12 @@ class ShowComponent extends React.Component {
         </div>
     }
 
+    handleShowTypeChange = (e) => {
+        this.setState({
+            showType: e.target.value
+        })
+    }
+
     changeFile = async (info) => {
         const { file } = info;
         const content = await file.originFileObj.text();
@@ -293,20 +285,27 @@ class ShowComponent extends React.Component {
         //         点我上传
         //     </Upload>
         // </div>;
+        const { showType } = this.state;
         return <Layout>
             <Menu theme='dark' mode='horizontal'>
                 <Menu.Item key="1">nav 1</Menu.Item>
                 <Menu.Item key="2">nav 2</Menu.Item>
                 <Menu.Item key="3">nav 3</Menu.Item>
             </Menu>
+            <div className={s.radioGroup}>
+                <Radio.Group value={showType} size='small' onChange={this.handleShowTypeChange}>
+                    <Radio.Button value={SHOW_TYPE.UNIFIED}>Unified</Radio.Button>
+                    <Radio.Button value={SHOW_TYPE.SPLITED}>Split</Radio.Button>
+                </Radio.Group>
+            </div>
+
             <Content className={s.content}>
                 <div className={s.color}>
-                    {/* <div>
-                        {this.getUnifiedRenderContent()}
-                    </div> */}
-                    {this.getSplitContent()}
+                    {this.isSplit ? this.getSplitContent()
+                        : this.getUnifiedRenderContent()}
                 </div>
             </Content>
+            <Footer style={{ textAlign: 'center' }}>Produced by 广兰路地铁</Footer>
         </Layout>
     }
 }
