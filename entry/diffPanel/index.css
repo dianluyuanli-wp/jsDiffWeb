@@ -1,0 +1,44 @@
+.charAdd {
+    color: green;
+}
+
+.charRemoved {
+    color: red;
+}
+
+.wrapper {
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-top: 2%;
+    background-color: #fff;
+    border-radius: 4px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.inputWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.input {
+    width: 45%;
+}
+
+.funWrapper {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+}
+
+.result {
+    font-size: 20px;
+    padding-left: 10%;
+}
+
+.preWrap {
+    padding-left: 10%;
+    padding-right: 10%;
+    white-space: pre-wrap;
+}
