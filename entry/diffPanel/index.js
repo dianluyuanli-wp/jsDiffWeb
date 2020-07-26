@@ -3,6 +3,7 @@ const jsDiff = require('diff');
 import s from './index.css';
 import { Upload, Button, Select, Input, Form } from 'antd';
 import ContentDiff from '../contentDiff';
+import cx from 'classnames';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -50,12 +51,13 @@ export default class WordDiff extends React.Component {
             'add': s.charAdd,
             'removed': s.charRemoved,
         }
+        console.log(this.state.diffArr);
         return <div className={s.result}>
             比较结果: 
             {this.state.diffArr.map((item, index) => {
                 const { value, added, removed } = item;
                 const type = added ? 'add' : (removed ? 'removed' : '')
-                return <span key={index} className={charColorMap[type]}>{value}</span>
+                return <span key={index} className={cx(charColorMap[type], s.charPreWrap)}>{value}</span>
                 })
             }
         </div>

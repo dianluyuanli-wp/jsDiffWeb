@@ -1,9 +1,11 @@
 .charAdd {
     color: green;
+    background-color: rgb(236, 253, 240);
 }
 
 .charRemoved {
     color: red;
+    background-color: rgb(251, 233, 235);
 }
 
 .wrapper {
@@ -40,5 +42,9 @@
 .preWrap {
     padding-left: 10%;
     padding-right: 10%;
+    white-space: pre-wrap;
+}
+
+.charPreWrap {
     white-space: pre-wrap;
 }
