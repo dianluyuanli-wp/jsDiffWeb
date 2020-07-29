@@ -51,7 +51,6 @@ export default class WordDiff extends React.Component {
             'add': s.charAdd,
             'removed': s.charRemoved,
         }
-        console.log(this.state.diffArr);
         return <div className={s.result}>
             比较结果: 
             {this.state.diffArr.map((item, index) => {
