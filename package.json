@@ -27,6 +27,7 @@
         "babel-plugin-import": "^1.13.0",
         "css-loader": "^0.28.11",
         "mini-css-extract-plugin": "^0.4.5",
+        "source-map-loader": "^1.0.1",
         "webpack": "^4.29.6",
         "webpack-cli": "^3.2.3"
     }
