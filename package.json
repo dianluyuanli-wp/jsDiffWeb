@@ -1,9 +1,10 @@
 {
     "name": "webdiff",
-    "version": "0.0.1",
+    "version": "0.0.5",
     "scripts": {
         "start": "node ./bin/start",
-        "build": "webpack --color --config webpack.config.js"
+        "build": "webpack --color --config webpack.config.js",
+        "deploy": "npm run build && node writeHtml.js"
     },
     "dependencies": {
         "@babel/core": "^7.3.4",
